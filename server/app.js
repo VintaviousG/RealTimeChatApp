@@ -1,25 +1,52 @@
 const express = require('express');
-
+const http = require('http');
+const socketIo = require('socket.io');
+const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
-const PORT = 5005;
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:3000', // Allow requests from the client
+    methods: ['GET', 'POST']
+  }
+});
 
-//enable cors
+// Middleware
 app.use(cors());
-// Define a GET route
-app.get('/api/data', (req, res) => {
-    // Simulate fetching data from a fake API
-    const data = {
-        message: 'Hello, world! this is from app.js file in server folder and also from the serve side.',
-        timestamp: new Date().toISOString()
-    };
+app.use(express.json());
 
-    // Send the data as a response
-    res.json(data);
+//MongoDB connection
+// mongoose.connect(process.env.MONGO_URI, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// });
+
+// Socket.IO connection
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
+
+  socket.on('chat message', (msg, room) => {
+    io.to(room).emit('chat message', msg);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// Server start
+const PORT = process.env.PORT || 5005;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+

@@ -1,31 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { arrayExample } from './array';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+//import io from 'socket.io-client';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import ChatRoom from './pages/ChatRoom';
+import Home from './pages/Home';
+
+//const socket = io('http://localhost:5005'); // Connect to the server
 
 
 
 
 function App() {
-  const [text, setText] = useState('');
-  useEffect(() => {
 
-    fetch('http://localhost:5005/api/data')
-      .then(response => response.json())
-      .then(data => setText(data.message))
-      .then(data => console.log(data))
-      
-      .catch(error => console.error("error", error));
-      
-
-}, []);
  
 
-  return (
-    <div className="App">
-      <h2>Importing an Array Example</h2>
-      <p>{ text}</p>
-   
-    </div>
-  );
+return (
+  <Router>
+    <Routes>
+      <Route path="/chat" element={<ChatRoom/>} />
+      <Route path="/" element={<Home/>} />
+    </Routes>
+  </Router>
+);
 }
 
 export default App;
