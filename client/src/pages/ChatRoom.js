@@ -1,64 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, ListGroup, Container } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5005');
+import NavBar from '../components/NavBar';
+import UserList from '../components/UserList';
+import ChatMessages from '../components/ChatMessages';
+import MessageInput from '../components/MessageInput';
 
-function ChatRoom() { 
-        const [message, setMessage] = useState('');
-        const [messages, setMessages] = useState([]);
-        const [room, setRoom] = useState('general'); //example room name
+const socket = io('http://localhost:5005'); // Connect to the server
 
-        useEffect(() => {
-                //Join the chat room 
-                socket.emit('joinRoom', room);
+function ChatRoom() {
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]); // List of users in the chat room
+  const [username, setUsername] = useState('John Doe'); // Example username
+  const [room, setRoom] = useState('general'); // Example room name
 
-                //Listen for messages from the server
-                socket.on('chat message', (msg) => {
-                        setMessages((prevMessages) => [...prevMessages, msg]);
-                });
+  useEffect(() => {
+    // Join the chat room
+    socket.emit('joinRoom', room);
 
-                //Clean up the effect component unmounts
-                return () => {
-                        socket.off('chat message');
-                        socket.emit('leaveRoom', room);
-                };
+    // Listen for messages from the server
+    socket.on('chat message', (msg) => {
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
 
-        }, [room]);
+    // Listen for user updates from the server
+    socket.on('roomUsers', (users) => {
+      setUsers(users);
+    });
 
-        //sending messages
-        const sendMessage = (evt) => {
-                evt.preventDefault();
-                if (message.trim()) {
-                        socket.emit('chat message', message, room);
-                        setMessage('');   
-                }
-        };
+    // Clean up on component unmount
+    return () => {
+      socket.off('chat message');
+      socket.off('roomUsers');
+      socket.emit('leaveRoom', room);
+    };
+  }, [room]);
 
-        return (
-                <Container>
-                <h1>Chat Room: {room}</h1>
-                <ListGroup>
-                    {messages.map((msg, index) => (
-                        <ListGroup.Item key={index}>{msg}</ListGroup.Item>
-                    ))}
-                </ListGroup>
-                <Form onSubmit={sendMessage}>
-                    <Form.Group controlId="message">
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter your message"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
-                    </Form.Group>
-                    <Button variant="primary" type="submit">
-                        Send
-                    </Button>
-                </Form>
-            </Container>
-        );
+  const sendMessage = (message) => {
+    socket.emit('chat message', message, room);
+  };
+
+  return (
+    <Container fluid>
+      <NavBar username={username} room={room} />
+      <Row>
+        <Col md={3}>
+          <UserList users={users} />
+        </Col>
+        <Col md={9}>
+          <ChatMessages messages={messages} />
+          <MessageInput sendMessage={sendMessage} />
+        </Col>
+      </Row>
+    </Container>
+  );
 }
-
 
 export default ChatRoom;

@@ -26,12 +26,19 @@ app.use(express.json());
 //   useUnifiedTopology: true
 // });
 
+let userCounter = 1;
+const users = {} //Object to track users in rooms
+
 // Socket.IO connection
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  const userNumber = userCounter++;
+  users[socket.id] = `User ${userNumber}`
+
+  console.log(`User ${userNumber} connected`);
 
   socket.on('joinRoom', (room) => {
     socket.join(room);
+    io.to(room).emit('roomUsers', Object.values(users));
     console.log(`User joined room: ${room}`);
   });
 
@@ -39,8 +46,14 @@ io.on('connection', (socket) => {
     io.to(room).emit('chat message', msg);
   });
 
+  // Listen for user disconnection
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log(`User ${userNumber} disconnected`);
+    delete users[socket.id];
+    for (const room of socket.rooms) {
+      io.to(room).emit('roomUsers', Object.values(users));
+    
+    }
   });
 });
 
