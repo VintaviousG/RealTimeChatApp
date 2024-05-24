@@ -43,7 +43,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (msg, room) => {
-    io.to(room).emit('chat message', msg);
+    const user = users[socket.id];
+    io.to(room).emit('chat message', { user, msg });
   });
 
   // Listen for user disconnection

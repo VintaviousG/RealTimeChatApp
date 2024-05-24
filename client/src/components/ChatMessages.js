@@ -7,7 +7,9 @@ function ChatMessages({ messages }) {
       <h5>Messages</h5>
       <ListGroup>
         {messages.map((msg, index) => (
-          <ListGroup.Item key={index}>{msg}</ListGroup.Item>
+          <ListGroup.Item key={index}>
+            <strong>{msg.user}:</strong> {msg.msg}
+          </ListGroup.Item>
         ))}
       </ListGroup>
     </div>
