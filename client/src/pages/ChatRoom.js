@@ -42,7 +42,7 @@ function ChatRoom() {
   };
 
   return (
-    <Container fluid>
+    <Container fluid >
       <NavBar username={username} room={room} />
       <Row>
         <Col md={3}>
