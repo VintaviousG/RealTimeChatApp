@@ -10,7 +10,7 @@ function NavBar({ username, room }) {
     <Navbar bg="light" expand="lg">
 
       <Nav.Link href="/">
-     <Button variant="primary">Go to Chat Room</Button>
+     <Button variant="primary">Go to Home Page</Button>
             </Nav.Link>
       
       <Navbar.Brand>Chat Room: {room}</Navbar.Brand>
