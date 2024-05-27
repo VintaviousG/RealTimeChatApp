@@ -1,24 +1,25 @@
 import React, {useState} from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
+import LoginButton from '../components/LoginButton';
 
 const Login = () => { 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Username:', username);
-        //Basic Validation tyou can add more validation here
-        if(username.trim() && password.trim()){
-            alert('Please enter username and password');
-            handleLogin();
-        }
-        
+   
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      // Basic validation, you can add more sophisticated checks    
+    if (username.trim() && password.trim()) {
+      handleLogin(username, password);
     }
+  };
 
-    const handleLogin = () => {
+    const handleLogin = (username, password) => {
         //You can add your login logic here
         console.log('Login logic here');
+        console.log('Username:', username);
+        console.log('Password:', password);
     }
 
     return (
@@ -45,7 +46,8 @@ const Login = () => {
             </Form.Group>
             <Button variant="primary" type="submit">
               Login
-            </Button>
+                </Button>
+                <LoginButton/>
           </Form>
         </Container>
       );

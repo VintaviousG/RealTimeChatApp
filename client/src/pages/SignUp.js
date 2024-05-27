@@ -13,6 +13,11 @@ function SignUp({ handleSignup }) {
     }
   };
 
+    handleSignup = (username, password) =>
+    {
+        console.log('Signup logic here');
+        console.log('Username:', username);
+     }
   return (
     <Container>
       <h2>Signup</h2>
